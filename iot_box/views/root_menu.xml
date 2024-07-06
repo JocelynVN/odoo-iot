@@ -1,0 +1,3 @@
+<odoo>
+	<menuitem id="root_menu" name="IoT" web_icon="iot_box,static/description/icon.png" groups="iot_box.group_iot_user" sequence="163"/>
+</odoo>
