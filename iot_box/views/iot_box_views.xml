@@ -1,0 +1,150 @@
+<odoo>
+	<record id="iot_box_kanban_view" model="ir.ui.view">
+		<field name="name">iot.box.kanban</field>
+		<field name="model">iot.box</field>
+		<field name="arch" type="xml">
+			<kanban create="1" edit="1" sample="1">
+				<field name="name" />
+				<field name="image_128" />
+				<field name="identifier" />
+				<field name="ip" />
+				<field name="state" />
+				<field name="id" />
+				<templates>
+					<t t-name="kanban-box">
+						<div class="oe_kanban_card oe_kanban_global_click">
+							<div class="o_kanban_image me-1">
+								<img t-att-src="kanban_image('iot.box', 'image_128', record.id.raw_value)" alt="IoT Box" class="o_image_64_contain" />
+							</div>
+							<div class="oe_kanban_details">
+								<div class="o_kanban_record_top my-0 d-flex justify-content-between">
+									<div class="oe_kanban_top_left">
+										<div class="o_kanban_record_headings">
+											<strong class="o_kanban_record_title">
+												<field name="name" />
+											</strong>
+										</div>
+										<div title="Identifier">
+											<field name="identifier" />
+										</div>
+									</div>
+									<div class="oe_kanban_top_right my-0 d-flex justify-content-between">
+										<div title="Status Connection">
+											<i t-if="record.state.raw_value == 'connected'" class="fa fa-fw fa-circle text-success" aria-label="Status Connection"
+												title="Status Connection" role="img" />
+											<i t-if="record.state.raw_value == 'disconnected'" class="fa fa-fw fa-circle text-danger" aria-label="Status Connection"
+												title="Status Connection" role="img" />
+										</div>
+									</div>
+								</div>
+								<div class="o_kanban_record_bottom mb-0">
+									<div class="oe_kanban_bottom_left">
+										<div title="IP Address">
+											<field name="ip" />
+										</div>
+									</div>
+									<div class="oe_kanban_bottom_right">
+										<div title="Number of Devices">
+											<a name="iot_box.iot_device_action" type="action"
+												t-att-context="{'search_default_iot_box_id': [record.id.raw_value], 'search_default_group_by_type': 1}">
+												<field name="device_nb" />
+												<span> Devices</span>
+											</a>
+										</div>
+									</div>
+								</div>
+							</div>
+								
+						</div>
+					</t>
+				</templates>
+			</kanban>
+		</field>
+	</record>
+
+	<record id="iot_box_tree_view" model="ir.ui.view">
+		<field name="name">iot.box.tree</field>
+		<field name="model">iot.box</field>
+		<field name="arch" type="xml">
+			<tree create="false" edit="false" sample="1" decoration-success="state == 'connected'" decoration-danger="state == 'disconnected'">
+				<field name="name" />
+				<field name="identifier" />
+				<field name="company_id" groups="base.group_multi_company" optional="{'no_create': 1}" />
+				<field name="ip" />
+				<field name="state" string="Connection Status"/>
+			</tree>
+		</field>
+	</record>
+
+	<record id="iot_box_form_view" model="ir.ui.view">
+		<field name="name">iot.box.form</field>
+		<field name="model">iot.box</field>
+		<field name="arch" type="xml">
+			<form create="false">
+				<header>
+					<button name="action_connection" type="object" string="Connect" invisible="state == 'connected'" class="oe_highlight" />
+					 <field name="state" widget="statusbar" />
+				</header>
+				<sheet>
+					<div class="oe_button_box" name="button_box">
+						<button name="action_open_devices" type="object" class="oe_stat_button" icon="fa-plug">
+							<field string="Devices" name="device_nb" widget="statinfo" class="o_stat_text" />
+						</button>
+					</div>
+					<field name="image_1920" widget="image" class="oe_avatar" />
+					<div class="oe_title">
+						<h1>
+							<field name="name" placeholder="IoT Box" required="1" />
+						</h1>
+					</div>
+					<group>
+						<group>
+							<field name="identifier" required="1" />
+							<field name="token" required="1" />
+							<field name="ip" string="IP" placeholder="0.0.0.0" required="1" />
+						</group>
+						<group>
+							<field name="company_id" groups="base.group_multi_company" optional="{'no_create': 1}" />
+						</group>
+					</group>
+				</sheet>
+				<div class="oe_chatter">
+					<field name="message_follower_ids" />
+					<field name="activity_ids" />
+					<field name="message_ids" />
+				</div>
+			</form>
+		</field>
+	</record>
+
+	<record id="iot_box_search_view" model="ir.ui.view">
+		<field name="name">iot.box.search</field>
+		<field name="model">iot.box</field>
+		<field name="arch" type="xml">
+			<search string="IoT Box">
+				<field name="name" />
+				<field name="identifier" />
+				<field name="ip" />
+				<field name="token" />
+				<filter name="filter_connected" string="Connected" domain="[('state', '=', 'connected')]" />
+				<group expand="0" string="Group By">
+					<filter name="group_by_connection_status" string="Connection Status" context="{'group_by': 'state'}" />
+					<filter name="group_by_company" string="Company" context="{'group_by': 'company_id'}" />
+				</group>
+			</search>
+		</field>
+	</record>
+
+	<record id="iot_box_action" model="ir.actions.act_window">
+		<field name="name">Iot Box</field>
+		<field name="res_model">iot.box</field>
+		<field name="view_mode">kanban,tree,form</field>
+		<field name="help" type="html">
+			<p class="o_view_nocontent_smiling_face">
+				No IoT Box found. Let's connect one!
+			</p>
+		</field>
+	</record>
+
+	<menuitem id="iot_box_menu" parent="iot_box.root_menu" action="iot_box.iot_box_action" name="Iot Boxes" />
+</odoo>

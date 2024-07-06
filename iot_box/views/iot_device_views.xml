@@ -1,0 +1,179 @@
+<odoo>
+<!-- 	<record id="iot_box_device_view_kanban" model="ir.ui.view">
+		<field name="name">viin.iot.device.view.kanban</field>
+		<field name="model">viin.iot.device</field>
+		<field name="arch" type="xml">
+			<kanban
+				class="oe_background_grey o_kanban_dashboard o_project_kanban"
+				group_create="false" group_edit="false" create="false" edit="false"
+				quick_create="false" sample="1">
+				<field name="name" />
+				<field name="type" />
+				<field name="connection_type" />
+				<field name="connected" />
+				<field name="iot_box_box_id" />
+				<field name="identifier" />
+				<templates>
+					<t t-name="kanban-box">
+						<div class="oe_kanban_global_click p-0">
+							<div class="row g-0">
+								<div class="col-3 p-2 text-center align-self-center">
+									<t t-set="fa_types"
+										t-value="{
+	                                    	'camera': 'video-camera',
+	                                        'printer': 'print',
+	                                        'device': 'device',
+	                                        'payment': 'credit-card',
+	                                        'scale': 'balance-scale',
+	                                        'keyboard': 'keyboard-o',
+	                                        'scanner': 'barcode',
+	                                        'display': 'desktop',
+	                                        'fiscal_data_module': 'archive'
+	                                        }" />
+									<i t-attf-class="fa fa-#{fa_types[record.type.raw_value]} fa-3x"
+										t-attf-title="Device type is #{record.type.raw_value}" />
+								</div>
+								<div class="col-9 p-2 border-start">
+									<div class="text-truncate fw-bold fs-3"
+										t-att-title="record.name.raw_value">
+										<field name="reminiscent_name" />
+									</div>
+									<div class="text-truncate fw-bold fs-6"
+										t-att-title="record.name.raw_value">
+										<field name="name" />
+									</div>
+									<span class="text-muted fst-italic text-truncate">
+										<field name="iot_box_box_id" />
+									</span>
+									<div>
+										<t t-if="record.connected.raw_value">
+											<span class="badge rounded-pill text-bg-success">Connected</span>
+										</t>
+										<t t-else="">
+											<span class="badge rounded-pill text-bg-light">Disconnected</span>
+										</t>
+										<t t-set="connections"
+											t-value="{'network': 'wifi',
+                                                                        'direct': 'usb',
+                                                                        'bluetooth': 'bluetooth-b',
+                                                                        'serial': 'usb',
+                                                                        'hdmi': 'usb'}" />
+										<span class="float-end fa-stack"
+											t-att-title="record.connection_type.raw_value">
+											<i
+												t-attf-class="fa fa-#{connections[record.connection_type.raw_value]}" />
+										</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</t>
+				</templates>
+			</kanban>
+		</field>
+	</record>
+
+	<record id="iot_box_device_view_tree" model="ir.ui.view">
+		<field name="name">viin.iot.device.view.tree</field>
+		<field name="model">viin.iot.device</field>
+		<field name="arch" type="xml">
+			<tree create="false" edit="false"
+				default_order="iot_box_box_id desc"
+				decoration-success="connected==True"
+				decoration-muted="connected==False" sample="1">
+				<field name="name" />
+				<field name="reminiscent_name" />
+				<field name="identifier" />
+				<field name="iot_box_box_id" />
+				<field name="connection_type" />
+				<field name="connected" column_invisible="True" />
+			</tree>
+		</field>
+	</record>
+
+	<record id="iot_box_device_view_form" model="ir.ui.view">
+		<field name="name">viin.iot.device.view.form</field>
+		<field name="model">viin.iot.device</field>
+		<field name="arch" type="xml">
+			<form create="false">
+				<sheet>
+					<div class="oe_button_box" name="button_box">
+						Reserved space for other modules to inherit
+					</div>
+					<div class="badge rounded-pill text-bg-success float-end fs-6"
+						invisible="not connected">Connected</div>
+					<div class="badge rounded-pill text-bg-light float-end fs-6"
+						invisible="connected">Disconnected</div>
+					<div class="oe_title">
+						<h1>
+							<field name="name" string="Name" />
+						</h1>
+					</div>
+					<group>
+						<group>
+							<field name="reminiscent_name"
+								placeholder="Reminiscent Name" />
+							<field name="type" />
+							<field name="identifier" />
+							<field name="connection_type" />
+							<field name="manufacturer" />
+						</group>
+						<group>
+							<field name="iot_box_box_id" />
+							<field name="iot_box_ip"
+								groups="iot_box.group_iot_user" />
+							<field name="display_url" widget="url"
+								invisible="type != 'display'"/>
+							<field name="connected" invisible="1" />
+							<field name="is_scanner" invisible="1" />
+							<field name="company_id" />
+						</group>
+					</group>
+				</sheet>
+				<div class="oe_chatter">
+					<field name="message_follower_ids" />
+					<field name="activity_ids" />
+					<field name="message_ids" />
+				</div>
+			</form>
+		</field>
+	</record>
+
+	<record id="iot_box_device_view_search" model="ir.ui.view">
+		<field name="name">iot_box_device.view.search</field>
+		<field name="model">viin.iot.device</field>
+		<field name="arch" type="xml">
+			<search string="IoT Device">
+				<field name="name" />
+				<field name="type" />
+				<field name="iot_box_box_id" />
+				<field name="connected" />
+				<filter name="connected" string="Connected"
+					domain="[('connected', '=', True)]" />
+				<filter name="connected" string="Disconnected"
+					domain="[('connected', '=', False)]" />
+				<group expand="0" string="Group By">
+					<filter name="group_by_type" string="Device type"
+						context="{'group_by': 'type'}" />
+					<filter name="group_by_iot_box_box_id" string="IoT Box"
+						context="{'group_by':'iot_box_box_id'}" />
+					<filter name="group_by_connection_type"
+						string="Connection Type" context="{'group_by':'connection_type'}" />
+				</group>
+			</search>
+		</field>
+	</record> -->
+
+	<record id="iot_device_action" model="ir.actions.act_window">
+		<field name="name">IoT Devices</field>
+		<field name="res_model">iot.device</field>
+		<field name="view_mode">kanban,tree,form</field>
+		<field name="help" type="html">
+			<p class="o_view_nocontent_smiling_face">
+				No IoT Device found. Let's connect to the IoT Box!
+			</p>
+		</field>
+	</record>
+
+	<menuitem id="iot_device_menu" parent="iot_box.root_menu" action="iot_box.iot_device_action" name="Iot Devices" />
+</odoo>
